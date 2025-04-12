@@ -234,6 +234,8 @@ in
     mesa
     libGL
     stow
+    gitui
+    
 
     (mpv.override {scripts = [mpvScripts.mpris];})
     
@@ -298,6 +300,7 @@ in
     uv
     ruff
     basedpyright
+    python3Packages.debugpy
 
     ]) ++ [
   	  python-packages
@@ -367,6 +370,7 @@ in
     https_proxy = "http://${httpProxy}";
     all_proxy = "http://${httpProxy}";
     no_proxy = "127.0.0.1,localhost,internal.domain,::1";
+    EDITOR = "hx";
   };
    
   # Select internationalisation properties.
