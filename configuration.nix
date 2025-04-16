@@ -4,9 +4,10 @@
 
 { config, pkgs, host, username, options, lib, inputs, system, ... }:
 
+# Must set this ip as .env
 let
-  httpProxy = "192.168.109.26:10809";
-  socksProxy = "192.168.109.26:10808";
+  httpProxy = "192.168.29.74:10809";
+  socksProxy = "192.168.29.74:10808";
 
   python-packages = pkgs.python3.withPackages (
     ps:
