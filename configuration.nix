@@ -515,21 +515,10 @@ in
   users.users.farzin= {
     isNormalUser = true;
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-    initialPassword = "password";
+    initialPassword = "password"; # Change Later
     packages = with pkgs; [
       tree
     ];
-  };
-
-  systemd.user.services.set-proxy = {
-    description = "Set proxy to default gateway";
-    wantedBy = [ "default.target" ];
-    serviceConfig = {
-      ExecStart = ''
-        ${pkgs.bash}/bin/bash -c 'export http_proxy=http://$(${pkgs.iproute2}/bin/ip route | ${pkgs.gawk}/bin/awk "/default via/ {print \$3; exit}"):10809/ https_proxy=http://$(${pkgs.iproute2}/bin/ip route | ${pkgs.gawk}/bin/awk "/default via/ {print \$3; exit}"):10809/'
-      '';
-      RemainAfterExit = "yes";
-    };
   };
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
