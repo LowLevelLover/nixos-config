@@ -6,14 +6,13 @@
 
 # Must set this ip as .env
 let
-  httpProxy = "192.168.29.74:10809";
-  socksProxy = "192.168.29.74:10808";
+  # httpProxy = "192.168.29.74:10809";
+  # socksProxy = "192.168.29.74:10808";
 
   python-packages = pkgs.python3.withPackages (
     ps:
       with ps; [
         requests
-        pyquery # needed for hyprland-dots Weather script
       ]
   );
 in
@@ -46,7 +45,7 @@ in
     blacklistedKernelModules = [ "nouveau" ];
 
     # This is for OBS Virtual Cam Support
-    kernelModules = [ "v4l2loopback" ];
+    kernelModules = [ "v4l2loopback" "snd_hda_intel" "vboxdrv" ];
     extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
     
     initrd = { 
@@ -182,6 +181,11 @@ in
     (nerdfonts.override { fonts = [ "FiraCode"]; })
   ];
 
+  virtualisation.virtualbox.host.enable = true;
+  users.extraGroups.vboxusers.members = [ "farzin" ];
+  virtualisation.virtualbox.guest.enable = true;
+  virtualisation.virtualbox.guest.dragAndDrop = true;
+
   environment.systemPackages = (with pkgs; [
     # System Packages
     btrfs-progs
@@ -236,7 +240,7 @@ in
     libGL
     stow
     gitui
-    
+    motrix
 
     (mpv.override {scripts = [mpvScripts.mpris];})
     
@@ -280,6 +284,8 @@ in
     xarchiver
     yad
     yt-dlp
+    xwaylandvideobridge
+    xdg-desktop-portal
 
     bluez
     bluez-tools
@@ -349,10 +355,15 @@ in
     extraPortals = [
       pkgs.xdg-desktop-portal-hyprland
     ];
-    # configPackages = [
-    #   pkgs.xdg-desktop-portal-gtk
-    #   pkgs.xdg-desktop-portal
-    # ];
+    config = {
+      hyprland = {
+        default = [ "hyprland" ];
+      };
+    };
+    configPackages = [
+      pkgs.xdg-desktop-portal-gtk
+      pkgs.xdg-desktop-portal
+    ];
   };
   
   users.users.farzin.shell = pkgs.fish;
@@ -360,19 +371,19 @@ in
   # Set your time zone.
   time.timeZone = "Asia/Tehran";
 
-  networking.proxy.default = "http://${httpProxy}";
-  networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain,::1";
+  # networking.proxy.default = "http://${httpProxy}";
+  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain,::1";
 
   # networking.nameservers = [ "185.51.200.2" "178.22.122.100" ];
   # networking.networkmanager.insertNameservers = [ "185.51.200.2" "178.22.122.100" ];
 
-  environment.variables = {
-    http_proxy = "http://${httpProxy}";
-    https_proxy = "http://${httpProxy}";
-    all_proxy = "http://${httpProxy}";
-    no_proxy = "127.0.0.1,localhost,internal.domain,::1";
-    EDITOR = "hx";
-  };
+  # environment.variables = {
+  #   http_proxy = "http://${httpProxy}";
+  #   https_proxy = "http://${httpProxy}";
+  #   all_proxy = "http://${httpProxy}";
+  #   no_proxy = "127.0.0.1,localhost,internal.domain,::1";
+  #   EDITOR = "hx";
+  # };
    
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
@@ -521,7 +532,12 @@ in
     ];
   };
 
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+    XDG_SESSION_TYPE = "wayland";
+    XDG_CURRENT_DESKTOP = "Hyprland";
+    XDG_SESSION_DESKTOP = "Hyprland";
+  };
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
