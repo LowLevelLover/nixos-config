@@ -181,10 +181,7 @@ in
     (nerdfonts.override { fonts = [ "FiraCode"]; })
   ];
 
-  virtualisation.virtualbox.host.enable = true;
   users.extraGroups.vboxusers.members = [ "farzin" ];
-  virtualisation.virtualbox.guest.enable = true;
-  virtualisation.virtualbox.guest.dragAndDrop = true;
 
   environment.systemPackages = (with pkgs; [
     # System Packages
@@ -241,6 +238,7 @@ in
     stow
     gitui
     motrix
+    docker-compose
 
     (mpv.override {scripts = [mpvScripts.mpris];})
     
@@ -366,8 +364,6 @@ in
     ];
   };
   
-  users.users.farzin.shell = pkgs.fish;
-
   # Set your time zone.
   time.timeZone = "Asia/Tehran";
 
@@ -515,17 +511,38 @@ in
   };
 
   # Virtualization / Containers
-  virtualisation.libvirtd.enable = true;
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-    defaultNetwork.settings.dns_enabled = true;
+  virtualisation = {
+    virtualbox.host.enable = true;
+    virtualbox.guest.enable = true;
+    virtualbox.guest.dragAndDrop = true;
+
+    containers.enable = true;
+    containers.storage.settings = {
+      storage = {
+        driver = "overlay";
+        runroot = "/run/containers/storage";
+        graphroot = "/var/lib/containers/storage";
+        rootless_storage_path = "/tmp/containers-$USER";
+        options.overlay.mountopt = "nodev,metacopy=on";
+      };
+    };
+
+    libvirtd.enable = true;
+    oci-containers.backend = "podman";
+    podman = {
+      enable = true;
+      dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = true;
+    };
   };
+
+  hardware.nvidia-container-toolkit.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.farzin= {
+    shell = pkgs.fish;
     isNormalUser = true;
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "docker" ]; # Enable ‘sudo’ for the user.
     initialPassword = "password"; # Change Later
     packages = with pkgs; [
       tree
