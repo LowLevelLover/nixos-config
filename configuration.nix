@@ -24,13 +24,13 @@ in
     ];
 
   nix.settings = {
-    download-attempts = 10;
+    download-attempts = 5;
     # http-connections = 50;
-    stalled-download-timeout = 300;
-    connect-timeout = 60;
-    max-jobs = 1;
-    builders-use-substitutes = true;
-    http-connections = 1;
+    # stalled-download-timeout = 300;
+    # connect-timeout = 60;
+    # max-jobs = 1;
+    # builders-use-substitutes = true;
+    # http-connections = 1;
   };
 
   boot = {
