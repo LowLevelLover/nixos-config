@@ -114,6 +114,8 @@ in
       vaapiVdpau
       libvdpau
       vdpauinfo
+      vulkan-loader
+      vulkan-tools
     ];
   };
 
@@ -123,11 +125,11 @@ in
     modesetting.enable = true;
     
     # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
-    powerManagement.enable = false;
+    powerManagement.enable = true;
     
     # Fine-grained power management. Turns off GPU when not in use.
     # Experimental and only works on modern Nvidia GPUs (Turing or newer).
-    powerManagement.finegrained = false;
+    powerManagement.finegrained = true;
     
     #dynamicBoost.enable = true; # Dynamic Boost
 
@@ -245,6 +247,20 @@ in
     gitui
     motrix
     docker-compose
+    zathura
+    zed-editor
+    vscode-fhs
+    shadow
+    bruno
+    ngrok
+    calibre
+
+    # Kotlin
+    jetbrains.idea-community
+    openjdk17
+    gradle
+    kotlin
+    kotlin-language-server
 
     (mpv.override {scripts = [mpvScripts.mpris];})
     
@@ -428,6 +444,16 @@ in
     })
   '';
 
+  security.wrappers.newuidmap = {
+    source = "${pkgs.shadow}/bin/newuidmap";
+    setuid = true;
+  };
+
+  security.wrappers.newgidmap = {
+    source = "${pkgs.shadow}/bin/newgidmap";
+    setuid = true;
+  };
+
   services = {
   
     asusd.enable = true;
@@ -534,12 +560,14 @@ in
     };
 
     libvirtd.enable = true;
-    oci-containers.backend = "podman";
-    podman = {
-      enable = true;
-      dockerCompat = true;
-      defaultNetwork.settings.dns_enabled = true;
-    };
+    # oci-containers.backend = "podman";
+    # podman = {
+    #   enable = true;
+    #   dockerCompat = true;
+    #   defaultNetwork.settings.dns_enabled = true;
+    # };
+    oci-containers.backend = "docker";
+    docker.enable = true;
   };
 
   hardware.nvidia-container-toolkit.enable = true;
@@ -548,6 +576,12 @@ in
   users.users.farzin= {
     shell = pkgs.fish;
     isNormalUser = true;
+    subUidRanges = [
+      { startUid = 100000; count = 65536; }
+    ];
+    subGidRanges = [
+      { startGid = 100000; count = 65536; }
+    ];
     extraGroups = [ "wheel" "docker" ]; # Enable ‘sudo’ for the user.
     initialPassword = "password"; # Change Later
     packages = with pkgs; [
