@@ -6,7 +6,7 @@
 
 # Must set this ip as .env
 let
-  # httpProxy = "192.168.29.74:10809";
+  httpProxy = "192.168.34.221:10809";
   # socksProxy = "192.168.29.74:10808";
 
   python-packages = pkgs.python3.withPackages (
@@ -254,6 +254,12 @@ in
     bruno
     ngrok
     calibre
+    beekeeper-studio
+    dbeaver-bin
+    appimage-run
+    libepoxy
+    google-chrome
+    obsidian
 
     # Kotlin
     jetbrains.idea-community
@@ -334,6 +340,14 @@ in
   ];
 
   programs = {
+    java = {
+      enable = true;
+      package = pkgs.jdk17;
+    };
+
+    nix-ld.enable = true;
+
+
     hyprland = {
       enable = true;
       portalPackage = pkgs.xdg-desktop-portal-hyprland; # xdph none git
@@ -389,8 +403,14 @@ in
   # Set your time zone.
   time.timeZone = "Asia/Tehran";
 
-  # networking.proxy.default = "http://${httpProxy}";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain,::1";
+  networking.proxy.default = "http://${httpProxy}";
+  networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain,::1";
+
+  networking.extraHosts = ''
+    127.0.0.1 kafka
+    # 192.168.1.100 kafka-node-1
+    # 192.168.1.101 kafka-node-2
+  '';
 
   # networking.nameservers = [ "185.51.200.2" "178.22.122.100" ];
   # networking.networkmanager.insertNameservers = [ "185.51.200.2" "178.22.122.100" ];
