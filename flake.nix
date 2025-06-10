@@ -31,6 +31,11 @@
         program = "${unstablePkgs.zellij}/bin/zellij";
     };
 
+    apps.${system}.code-cursor = {
+        type = "app";
+        program = "${unstablePkgs.code-cursor}/bin/cursor";
+    };
+
   	nixosConfigurations = {
       "${host}" = nixpkgs-stable.lib.nixosSystem rec {
         specialArgs = { 

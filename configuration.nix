@@ -6,7 +6,7 @@
 
 # Must set this ip as .env
 let
-  httpProxy = "192.168.34.221:10809";
+  httpProxy = "192.168.246.220:10809";
   # socksProxy = "192.168.29.74:10808";
 
   python-packages = pkgs.python3.withPackages (
@@ -248,18 +248,21 @@ in
     motrix
     docker-compose
     zathura
-    zed-editor
     vscode-fhs
     shadow
     bruno
-    ngrok
     calibre
     beekeeper-studio
     dbeaver-bin
-    appimage-run
     libepoxy
     google-chrome
     obsidian
+    ripgrep
+    xclip
+    nodejs
+    nodePackages.npm
+    kubectl
+    krew
 
     # Kotlin
     jetbrains.idea-community
@@ -268,8 +271,6 @@ in
     kotlin
     kotlin-language-server
 
-    (mpv.override {scripts = [mpvScripts.mpris];})
-    
     # Hyprland
     ags # desktop overview  
     btop
@@ -340,13 +341,12 @@ in
   ];
 
   programs = {
-    java = {
+    neovim = {
       enable = true;
-      package = pkgs.jdk17;
+      defaultEditor = true;
     };
 
     nix-ld.enable = true;
-
 
     hyprland = {
       enable = true;
@@ -415,13 +415,13 @@ in
   # networking.nameservers = [ "185.51.200.2" "178.22.122.100" ];
   # networking.networkmanager.insertNameservers = [ "185.51.200.2" "178.22.122.100" ];
 
-  # environment.variables = {
+  environment.variables = {
   #   http_proxy = "http://${httpProxy}";
   #   https_proxy = "http://${httpProxy}";
   #   all_proxy = "http://${httpProxy}";
   #   no_proxy = "127.0.0.1,localhost,internal.domain,::1";
-  #   EDITOR = "hx";
-  # };
+     EDITOR = "nvim";
+  };
    
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
