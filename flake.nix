@@ -23,17 +23,29 @@
         allowUnfree = true;
       };
     };
-    unstablePkgs = import nixpkgs-unstable { inherit system; };
+    unstablePkgs = import nixpkgs-unstable {
+        inherit system;
+        config = {
+            allowUnfree = true;
+        };
+    };
   in
   {
-    apps.${system}.zellij = {
-        type = "app";
-        program = "${unstablePkgs.zellij}/bin/zellij";
-    };
+    apps.${system} = {
+        zellij = {
+            type = "app";
+            program = "${unstablePkgs.zellij}/bin/zellij";
+        };
 
-    apps.${system}.code-cursor = {
-        type = "app";
-        program = "${unstablePkgs.code-cursor}/bin/cursor";
+        code-cursor = {
+            type = "app";
+            program = "${unstablePkgs.code-cursor}/bin/cursor";
+        };
+
+        jujutsu = {
+            type = "app";
+            program = "${unstablePkgs.jujutsu}/bin/jj";
+        };
     };
 
   	nixosConfigurations = {

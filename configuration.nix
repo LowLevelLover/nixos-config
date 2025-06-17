@@ -6,7 +6,7 @@
 
 # Must set this ip as .env
 let
-  httpProxy = "192.168.246.220:10809";
+  httpProxy = "192.168.72.254:10809";
   # socksProxy = "192.168.29.74:10808";
 
   python-packages = pkgs.python3.withPackages (
