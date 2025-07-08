@@ -31,35 +31,36 @@
     };
   in
   {
-    apps.${system} = {
-        zellij = {
-            type = "app";
-            program = "${unstablePkgs.zellij}/bin/zellij";
-        };
-
-        code-cursor = {
-            type = "app";
-            program = "${unstablePkgs.code-cursor}/bin/cursor";
-        };
-
-        jujutsu = {
-            type = "app";
-            program = "${unstablePkgs.jujutsu}/bin/jj";
-        };
-    };
-
   	nixosConfigurations = {
       "${host}" = nixpkgs-stable.lib.nixosSystem rec {
         specialArgs = { 
-      			inherit system;
-      			inherit inputs;
-      			inherit username;
-      			inherit host;
-    		};
+            inherit system;
+            inherit inputs;
+            inherit username;
+            inherit host;
+
+            # Inject both stable and unstable pkgs
+            pkgs-stable = import inputs.nixpkgs-stable {
+                inherit system;
+                config.allowUnfree = true;
+                overlays = [
+                    (final: prev: {
+                        vaapiIntel = prev.vaapiIntel.override {
+                            enableHybridCodec = true;
+                        };
+                    })
+                ];
+            };
+
+            pkgs-unstable = import inputs.nixpkgs-unstable {
+                inherit system;
+                config.allowUnfree = true;
+            };
+        };
         modules = [ 
           ./configuration.nix
         ];
-			};
-		};
+	  };
 	};
+  };
 }

@@ -2,14 +2,14 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, pkgs, host, username, options, lib, inputs, system, ... }:
+{ config, pkgs-stable, pkgs-unstable, host, username, options, lib, inputs, system, ... }:
 
 # Must set this ip as .env
 let
-  httpProxy = "192.168.72.254:10809";
+    #httpProxy = "http://192.168.195.152:10809";
   # socksProxy = "192.168.29.74:10808";
 
-  python-packages = pkgs.python3.withPackages (
+  python-packages = pkgs-stable.python3.withPackages (
     ps:
       with ps; [
         requests
@@ -34,9 +34,9 @@ in
   };
 
   boot = {
-    # kernelPackages = pkgs.linuxPackages_zen; # zen Kernel
-    # kernelPackages = pkgs.linuxPackages_latest; # Kernel 
-    kernelPackages = pkgs.linuxPackages_6_12; # Kernel 
+    # kernelPackages = pkgs-stable.linuxPackages_zen; # zen Kernel
+    # kernelPackages = pkgs-stable.linuxPackages_latest; # Kernel 
+    kernelPackages = pkgs-stable.linuxPackages_6_12; # Kernel 
 
     kernelParams = [
       "systemd.mask=systemd-vconsole-setup.service"
@@ -51,7 +51,10 @@ in
     blacklistedKernelModules = [ "nouveau" ];
 
     # This is for OBS Virtual Cam Support
-    kernelModules = [ "v4l2loopback" "snd_hda_intel" "vboxdrv" ];
+    kernelModules = [ "v4l2loopback" "snd_hda_intel" "vboxdrv" "hid_apple" ];
+    extraModprobeConfig = ''
+        options hid_apple fnmode=2
+    '';
     extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
     
     initrd = { 
@@ -86,7 +89,7 @@ in
     # Appimage Support
     binfmt.registrations.appimage = {
       wrapInterpreterInShell = false;
-      interpreter = "${pkgs.appimage-run}/bin/appimage-run";
+      interpreter = "${pkgs-stable.appimage-run}/bin/appimage-run";
       recognitionType = "magic";
       offset = 0;
       mask = ''\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff'';
@@ -98,14 +101,10 @@ in
     plymouth.enable = true;
   };
 
-  nixpkgs.config.packageOverrides = pkgs: {
-    vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
-  };
-
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
-    extraPackages = with pkgs; [
+    extraPackages = with pkgs-stable; [
       nvidia-vaapi-driver
       intel-media-driver
       libvdpau-va-gl
@@ -183,15 +182,13 @@ in
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
 
-  nixpkgs.config.allowUnfree = true;
-
-  fonts.packages = with pkgs; [
+  fonts.packages = with pkgs-stable; [
     (nerdfonts.override { fonts = [ "FiraCode"]; })
   ];
 
   users.extraGroups.vboxusers.members = [ "farzin" ];
 
-  environment.systemPackages = (with pkgs; [
+  environment.systemPackages = (with pkgs-stable; [
     # System Packages
     btrfs-progs
     cpufrequtils
@@ -338,7 +335,11 @@ in
 
     ]) ++ [
   	  python-packages
-  ];
+  ] ++ (with pkgs-unstable; [
+    code-cursor
+    zellij
+    jujutsu
+  ]);
 
   programs = {
     neovim = {
@@ -350,7 +351,7 @@ in
 
     hyprland = {
       enable = true;
-      portalPackage = pkgs.xdg-desktop-portal-hyprland; # xdph none git
+      portalPackage = pkgs-stable.xdg-desktop-portal-hyprland; # xdph none git
       xwayland.enable = true;
     };
 
@@ -361,7 +362,7 @@ in
     git.enable = true;
     nm-applet.indicator = true;
     thunar.enable = true;
-    thunar.plugins = with pkgs.xfce; [
+    thunar.plugins = with pkgs-stable.xfce; [
 		  exo
 		  mousepad
 		  thunar-archive-plugin
@@ -387,7 +388,7 @@ in
     enable = true;
     wlr.enable = false;
     extraPortals = [
-      pkgs.xdg-desktop-portal-hyprland
+      pkgs-stable.xdg-desktop-portal-hyprland
     ];
     config = {
       hyprland = {
@@ -395,16 +396,16 @@ in
       };
     };
     configPackages = [
-      pkgs.xdg-desktop-portal-gtk
-      pkgs.xdg-desktop-portal
+      pkgs-stable.xdg-desktop-portal-gtk
+      pkgs-stable.xdg-desktop-portal
     ];
   };
   
   # Set your time zone.
   time.timeZone = "Asia/Tehran";
 
-  networking.proxy.default = "http://${httpProxy}";
-  networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain,::1";
+    # networking.proxy.default = "${httpProxy}";
+    # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain,::1";
 
   networking.extraHosts = ''
     127.0.0.1 kafka
@@ -416,10 +417,10 @@ in
   # networking.networkmanager.insertNameservers = [ "185.51.200.2" "178.22.122.100" ];
 
   environment.variables = {
-  #   http_proxy = "http://${httpProxy}";
-  #   https_proxy = "http://${httpProxy}";
-  #   all_proxy = "http://${httpProxy}";
-  #   no_proxy = "127.0.0.1,localhost,internal.domain,::1";
+    #   http_proxy = "${httpProxy}";
+    #   https_proxy = "${httpProxy}";
+    # all_proxy = "${httpProxy}";
+    # no_proxy = "127.0.0.1,localhost,internal.domain,::1";
      EDITOR = "nvim";
   };
    
@@ -465,12 +466,12 @@ in
   '';
 
   security.wrappers.newuidmap = {
-    source = "${pkgs.shadow}/bin/newuidmap";
+    source = "${pkgs-stable.shadow}/bin/newuidmap";
     setuid = true;
   };
 
   security.wrappers.newgidmap = {
-    source = "${pkgs.shadow}/bin/newgidmap";
+    source = "${pkgs-stable.shadow}/bin/newgidmap";
     setuid = true;
   };
 
@@ -594,7 +595,7 @@ in
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.farzin= {
-    shell = pkgs.fish;
+    shell = pkgs-stable.fish;
     isNormalUser = true;
     subUidRanges = [
       { startUid = 100000; count = 65536; }
@@ -604,7 +605,7 @@ in
     ];
     extraGroups = [ "wheel" "docker" ]; # Enable ‘sudo’ for the user.
     initialPassword = "password"; # Change Later
-    packages = with pkgs; [
+    packages = with pkgs-stable; [
       tree
     ];
   };
@@ -627,7 +628,7 @@ in
   # Most users should NEVER change this value after the initial install, for any reason,
   # even if you've upgraded your system to a new NixOS release.
   #
-  # This value does NOT affect the Nixpkgs version your packages and OS are pulled from,
+  # This value does NOT affect the Nixpkgs-stable version your packages and OS are pulled from,
   # so changing it will NOT upgrade your system - see https://nixos.org/manual/nixos/stable/#sec-upgrading for how
   # to actually do that.
   #
@@ -640,4 +641,3 @@ in
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "24.11"; # Did you read the comment?
 }
-
