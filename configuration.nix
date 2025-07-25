@@ -6,7 +6,7 @@
 
 # Must set this ip as .env
 let
-    #httpProxy = "http://192.168.195.152:10809";
+    httpProxy = "http://192.168.87.129:10809";
   # socksProxy = "192.168.29.74:10808";
 
   python-packages = pkgs-stable.python3.withPackages (
@@ -105,8 +105,10 @@ in
     enable = true;
     enable32Bit = true;
     extraPackages = with pkgs-stable; [
-      nvidia-vaapi-driver
+      mesa.drivers
+      libglvnd
       intel-media-driver
+      nvidia-vaapi-driver
       libvdpau-va-gl
       libva
       libva-utils
@@ -239,6 +241,7 @@ in
     wayland-scanner
     freeglut
     mesa
+    libdrm
     libGL
     stow
     gitui
@@ -260,6 +263,30 @@ in
     nodePackages.npm
     kubectl
     krew
+
+    # Qt platform plugins
+    qt5.qtbase
+    qt5.qtwayland
+    qt5.qttools
+    qt5.qtquickcontrols2
+
+    # For X11 support
+    xorg.libX11
+    xorg.libxcb
+    xorg.xcbutil
+    xorg.libXrender
+
+    # GStreamer
+    gst_all_1.gstreamer
+    gst_all_1.gst-plugins-base
+
+    gst_all_1.gst-plugins-good
+    gst_all_1.gst-plugins-bad
+    gst_all_1.gst-plugins-ugly
+    gst_all_1.gst-libav
+
+    gst_all_1.gst-vaapi
+    fdk_aac
 
     # Kotlin
     jetbrains.idea-community
@@ -339,6 +366,7 @@ in
     code-cursor
     zellij
     jujutsu
+    yaak
   ]);
 
   programs = {
@@ -404,8 +432,8 @@ in
   # Set your time zone.
   time.timeZone = "Asia/Tehran";
 
-    # networking.proxy.default = "${httpProxy}";
-    # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain,::1";
+    networking.proxy.default = "${httpProxy}";
+    networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain,::1";
 
   networking.extraHosts = ''
     127.0.0.1 kafka
@@ -417,10 +445,10 @@ in
   # networking.networkmanager.insertNameservers = [ "185.51.200.2" "178.22.122.100" ];
 
   environment.variables = {
-    #   http_proxy = "${httpProxy}";
-    #   https_proxy = "${httpProxy}";
-    # all_proxy = "${httpProxy}";
-    # no_proxy = "127.0.0.1,localhost,internal.domain,::1";
+     http_proxy = "${httpProxy}";
+     https_proxy = "${httpProxy}";
+     all_proxy = "${httpProxy}";
+     no_proxy = "127.0.0.1,localhost,internal.domain,::1";
      EDITOR = "nvim";
   };
    
