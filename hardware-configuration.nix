@@ -14,17 +14,12 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/ab4fd622-ea28-402e-8660-b0d5157d65f8";
+    { device = "/dev/disk/by-uuid/e8d9651f-ac25-4b40-8dce-7ad7c1fa9d79";
       fsType = "ext4";
     };
 
-  #fileSystems."/boot" =
-  #  { device = "/dev/disk/by-uuid/bc1f1e0b-b53d-422c-87c4-cbc4d3e32218";
-  #    fsType = "ext4";
-  #  };
-
-  fileSystems."/boot/efi" =
-    { device = "/dev/disk/by-uuid/8845-5B7D";
+  fileSystems."/boot" =
+    { device = "/dev/disk/by-uuid/14EA-1BAE";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
@@ -36,6 +31,7 @@
   # still possible to use this option, but it's recommended to use it in conjunction
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
+  # networking.interfaces.enp0s20f0u1.useDHCP = lib.mkDefault true;
   # networking.interfaces.enp108s0.useDHCP = lib.mkDefault true;
   # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
 

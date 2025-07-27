@@ -72,7 +72,7 @@ in
     loader.systemd-boot.enable = true;
   
     loader.efi = {
-	    efiSysMountPoint = "/boot/efi"; #this is if you have separate /efi partition
+	    efiSysMountPoint = "/boot"; #this is if you have separate /efi partition
 	    canTouchEfiVariables = true;
 	  };
 
