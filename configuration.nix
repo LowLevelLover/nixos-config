@@ -47,6 +47,10 @@ in
       "nvidia-drm.modeset=1"
  	  ];
 
+    kernel.sysctl = {
+      "vm.swappiness" = 10;
+    };
+
     # Blacklist nouveau to avoid conflicts
     blacklistedKernelModules = [ "nouveau" ];
 
@@ -70,6 +74,8 @@ in
     ## BOOT LOADERS: NOTE USE ONLY 1. either systemd or grub  
     # Bootloader SystemD
     loader.systemd-boot.enable = true;
+    loader.systemd-boot.editor = false;
+    loader.systemd-boot.configurationLimit = 10;
   
     loader.efi = {
 	    efiSysMountPoint = "/boot"; #this is if you have separate /efi partition
@@ -409,6 +415,12 @@ in
     gnupg.agent = {
       enable = true;
       enableSSHSupport = true;
+    };
+
+    command-not-found.enable = false;
+    nix-index = {
+      enable = true;
+      enableBashIntegration = true; # or Zsh if you use that
     };
   };
 
