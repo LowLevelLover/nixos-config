@@ -6,8 +6,7 @@
 
 # Must set this ip as .env
 let
-    httpProxy = "http://192.168.87.129:10809";
-  # socksProxy = "192.168.29.74:10808";
+  httpProxy = "http://10.164.88.51:10809";
 
   python-packages = pkgs-stable.python3.withPackages (
     ps:
@@ -269,6 +268,9 @@ in
     nodePackages.npm
     kubectl
     krew
+    hyprshot
+    mcron
+    just
 
     # Qt platform plugins
     qt5.qtbase
@@ -294,8 +296,13 @@ in
     gst_all_1.gst-vaapi
     fdk_aac
 
-    # Kotlin
+    # JetBrains
+    jetbrains.rust-rover
     jetbrains.idea-community
+    jetbrains.clion
+    jetbrains.webstorm
+
+    # Kotlin
     openjdk17
     gradle
     kotlin
@@ -373,6 +380,8 @@ in
     zellij
     jujutsu
     yaak
+    pocketbase
+    zed-editor
   ]);
 
   programs = {
