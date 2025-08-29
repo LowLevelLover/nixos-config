@@ -298,7 +298,8 @@ in
 
     # JetBrains
     jetbrains.rust-rover
-    jetbrains.idea-community
+    jetbrains.idea-community-bin
+    jetbrains.idea-ultimate
     jetbrains.clion
     jetbrains.webstorm
 
