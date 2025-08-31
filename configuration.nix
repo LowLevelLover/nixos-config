@@ -110,7 +110,7 @@ in
     enable = true;
     enable32Bit = true;
     extraPackages = with pkgs-stable; [
-      mesa.drivers
+      mesa
       libglvnd
       intel-media-driver
       nvidia-vaapi-driver
@@ -190,7 +190,7 @@ in
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
 
   fonts.packages = with pkgs-stable; [
-    (nerdfonts.override { fonts = [ "FiraCode"]; })
+    nerd-fonts.fira-code
   ];
 
   users.extraGroups.vboxusers.members = [ "farzin" ];
@@ -245,7 +245,6 @@ in
     wayland-protocols
     wayland-scanner
     freeglut
-    mesa
     libdrm
     libGL
     stow
@@ -257,7 +256,6 @@ in
     shadow
     bruno
     calibre
-    beekeeper-studio
     dbeaver-bin
     libepoxy
     google-chrome
@@ -349,7 +347,7 @@ in
     xarchiver
     yad
     yt-dlp
-    xwaylandvideobridge
+    kdePackages.xwaylandvideobridge
     xdg-desktop-portal
 
     bluez
