@@ -34,33 +34,38 @@
   	nixosConfigurations = {
       "${host}" = nixpkgs-stable.lib.nixosSystem rec {
         specialArgs = { 
-            inherit system;
-            inherit inputs;
-            inherit username;
-            inherit host;
+          inherit system;
+          inherit inputs;
+          inherit username;
+          inherit host;
 
-            # Inject both stable and unstable pkgs
-            pkgs-stable = import inputs.nixpkgs-stable {
-                inherit system;
-                config.allowUnfree = true;
-                overlays = [
-                    (final: prev: {
-                        vaapiIntel = prev.vaapiIntel.override {
-                            enableHybridCodec = true;
-                        };
-                    })
-                ];
-            };
+          # Inject both stable and unstable pkgs
+          pkgs-stable = import inputs.nixpkgs-stable {
+              inherit system;
+              config.allowUnfree = true;
+              overlays = [
+                  (final: prev: {
+                      vaapiIntel = prev.vaapiIntel.override {
+                          enableHybridCodec = true;
+                      };
+                  })
+              ];
+          };
 
-            pkgs-unstable = import inputs.nixpkgs-unstable {
-                inherit system;
-                config.allowUnfree = true;
-            };
+          pkgs-unstable = import inputs.nixpkgs-unstable {
+              inherit system;
+              config.allowUnfree = true;
+          };
         };
         modules = [ 
           ./configuration.nix
+          {
+            environment.systemPackages = with pkgs; [
+              (callPackage ./pkgs/ktea.nix {})
+            ];
+          }
         ];
-	  };
-	};
+  	  };
+  	};
   };
 }

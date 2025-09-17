@@ -6,7 +6,7 @@
 
 # Must set this ip as .env
 let
-  httpProxy = "http://10.164.88.51:10809";
+  httpProxy = "http://10.23.13.153:10809";
 
   python-packages = pkgs-stable.python3.withPackages (
     ps:
@@ -269,6 +269,7 @@ in
     hyprshot
     mcron
     just
+    typescript-language-server
 
     # Qt platform plugins
     qt5.qtbase
@@ -322,6 +323,7 @@ in
     inxi
     jq
     kitty
+    ghostty
     libsForQt5.qtstyleplugin-kvantum #kvantum
     networkmanagerapplet
     nwg-displays
@@ -412,7 +414,7 @@ in
 		  tumbler
 	  ];
 
-    virt-manager.enable = false;
+    virt-manager.enable = true;
 
     xwayland.enable = true;
 
@@ -651,7 +653,7 @@ in
     subGidRanges = [
       { startGid = 100000; count = 65536; }
     ];
-    extraGroups = [ "wheel" "docker" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "docker" "libvirt" ]; # Enable ‘sudo’ for the user.
     initialPassword = "password"; # Change Later
     packages = with pkgs-stable; [
       tree
