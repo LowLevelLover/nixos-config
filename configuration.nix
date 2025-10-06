@@ -270,6 +270,7 @@ in
     mcron
     just
     typescript-language-server
+    intelli-shell
 
     # Qt platform plugins
     qt5.qtbase
@@ -381,7 +382,6 @@ in
     zellij
     jujutsu
     yaak
-    pocketbase
     zed-editor
   ]);
 
@@ -526,7 +526,6 @@ in
   };
 
   services = {
-  
     asusd.enable = true;
     asusd.enableUserService = true;
     supergfxd.enable = true;
