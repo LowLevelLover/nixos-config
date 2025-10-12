@@ -271,6 +271,7 @@ in
     just
     typescript-language-server
     intelli-shell
+    lldb
 
     # Qt platform plugins
     qt5.qtbase
@@ -526,6 +527,10 @@ in
   };
 
   services = {
+    logind.extraConfig = ''
+      HandlePowerKey=ignore
+    '';
+
     asusd.enable = true;
     asusd.enableUserService = true;
     supergfxd.enable = true;
