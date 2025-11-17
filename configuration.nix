@@ -6,7 +6,7 @@
 
 # Must set this ip as .env
 let
-  httpProxy = "http://10.23.13.153:10809";
+  httpProxy = "http://10.125.41.245:10809";
 
   python-packages = pkgs-stable.python3.withPackages (
     ps:
@@ -24,9 +24,9 @@ in
 
   nix.settings = {
     download-attempts = 5;
-    # http-connections = 50;
-    # stalled-download-timeout = 300;
-    # connect-timeout = 60;
+    http-connections = 50;
+    stalled-download-timeout = 300;
+    connect-timeout = 60;
     # max-jobs = 1;
     # builders-use-substitutes = true;
     # http-connections = 1;
@@ -272,6 +272,7 @@ in
     typescript-language-server
     intelli-shell
     lldb
+    entr
 
     # Qt platform plugins
     qt5.qtbase
@@ -298,11 +299,9 @@ in
     fdk_aac
 
     # JetBrains
-    jetbrains.rust-rover
     jetbrains.idea-community-bin
     jetbrains.idea-ultimate
     jetbrains.clion
-    jetbrains.webstorm
 
     # Kotlin
     openjdk17
