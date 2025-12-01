@@ -6,7 +6,7 @@
 
 # Must set this ip as .env
 let
-  httpProxy = "http://10.125.41.245:10809";
+  httpProxy = "http://localhost:20171";
 
   python-packages = pkgs-stable.python3.withPackages (
     ps:
@@ -273,6 +273,10 @@ in
     intelli-shell
     lldb
     entr
+
+    # VPN
+    #hiddify-app
+    v2raya
 
     # Qt platform plugins
     qt5.qtbase
