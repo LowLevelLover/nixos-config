@@ -1,4 +1,3 @@
-# Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
@@ -23,11 +22,11 @@ in
     ];
 
   nix.settings = {
-    download-attempts = 5;
-    http-connections = 50;
+    download-attempts = 8;
+    http-connections = 32;
     stalled-download-timeout = 300;
     connect-timeout = 60;
-    # max-jobs = 1;
+    max-jobs = 1;
     # builders-use-substitutes = true;
     # http-connections = 1;
   };
@@ -117,7 +116,7 @@ in
       libvdpau-va-gl
       libva
       libva-utils
-      vaapiVdpau
+      libva-vdpau-driver
       libvdpau
       vdpauinfo
       vulkan-loader
@@ -273,6 +272,8 @@ in
     intelli-shell
     lldb
     entr
+    cacert
+    alacritty
 
     # VPN
     #hiddify-app
@@ -305,7 +306,6 @@ in
     # JetBrains
     jetbrains.idea-community-bin
     jetbrains.idea-ultimate
-    jetbrains.clion
 
     # Kotlin
     openjdk17
@@ -342,7 +342,7 @@ in
     kdePackages.qt6ct
     kdePackages.qtwayland
     kdePackages.qtstyleplugin-kvantum #kvantum
-    rofi-wayland
+    rofi
     slurp
     swappy
     swaynotificationcenter
@@ -354,8 +354,11 @@ in
     xarchiver
     yad
     yt-dlp
-    kdePackages.xwaylandvideobridge
     xdg-desktop-portal
+    hyprland-qt-support
+    hyprcursor
+    hyprlandPlugins.hyprgrass
+
 
     bluez
     bluez-tools
@@ -471,11 +474,14 @@ in
   # networking.networkmanager.insertNameservers = [ "185.51.200.2" "178.22.122.100" ];
 
   environment.variables = {
-     http_proxy = "${httpProxy}";
-     https_proxy = "${httpProxy}";
-     all_proxy = "${httpProxy}";
-     no_proxy = "127.0.0.1,localhost,internal.domain,::1";
-     EDITOR = "nvim";
+    http_proxy = "${httpProxy}";
+    https_proxy = "${httpProxy}";
+    all_proxy = "${httpProxy}";
+    no_proxy = "127.0.0.1,localhost,internal.domain,::1";
+    EDITOR = "nvim";
+    SSL_CERT_FILE = "${pkgs-stable.cacert}/etc/ssl/certs/ca-bundle.crt";
+    CURL_CA_BUNDLE = "${pkgs-stable.cacert}/etc/ssl/certs/ca-bundle.crt";
+    NIX_SSL_CERT_FILE = "${pkgs-stable.cacert}/etc/ssl/certs/ca-bundle.crt";
   };
    
   # Select internationalisation properties.
@@ -530,17 +536,26 @@ in
   };
 
   services = {
-    logind.extraConfig = ''
-      HandlePowerKey=ignore
-    '';
+    logind.settings = {
+      Login = {
+        HandlePowerKey = "ignore";
+      };
+    };
 
     asusd.enable = true;
     asusd.enableUserService = true;
     supergfxd.enable = true;
 
-    tlp.settings = {
-      "START_CHARGE_THRESH_BAT0" = 40;  # Start charging below 40%
-      "STOP_CHARGE_THRESH_BAT0" = 80;   # Stop charging at 80%
+    v2raya.enable = true;
+
+    tlp = {
+      enable = true;
+      settings = {
+        "START_CHARGE_THRESH_BAT0" = 40;
+        "STOP_CHARGE_THRESH_BAT0" = 80;
+        "INTEL_GPU_MIN_FREQ_ON_AC" = 500;
+        "INTEL_GPU_MIN_FREQ_ON_BAT" = 500;
+      };
     };
 
     pipewire = {
@@ -590,7 +605,7 @@ in
 
     gvfs.enable = true;
   
-    xserver.displayManager.gdm = {
+    displayManager.gdm = {
       enable = true;
       wayland = true;
     };
