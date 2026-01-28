@@ -5,7 +5,7 @@
 
 # Must set this ip as .env
 let
-  httpProxy = "http://localhost:20171";
+  httpProxy = "http://192.168.70.166:10809";
 
   python-packages = pkgs-stable.python3.withPackages (
     ps:
@@ -19,6 +19,7 @@ in
   imports =
     [
       ./hardware-configuration.nix
+      inputs.hyprland.nixosModules.default
     ];
 
   nix.settings = {
@@ -176,7 +177,8 @@ in
     nvidiaBusId = "PCI:1:0:0";
   };
 
-  time.hardwareClockInLocalTime = true;
+  time.timeZone = "Asia/Tehran";
+  time.hardwareClockInLocalTime = false;
 
   # Use the systemd-boot EFI boot loader.
   # boot.loader.systemd-boot.enable = true;
@@ -238,7 +240,6 @@ in
     supergfxctl
     pkg-config
     tlp
-    xdg-desktop-portal-hyprland
     ninja
     udis86
     wayland-protocols
@@ -274,6 +275,9 @@ in
     entr
     cacert
     alacritty
+    gnome-disk-utility
+    nmap
+    zeal
 
     # VPN
     #hiddify-app
@@ -357,7 +361,8 @@ in
     xdg-desktop-portal
     hyprland-qt-support
     hyprcursor
-    hyprlandPlugins.hyprgrass
+    # hyprlandPlugins.hypr-dynamic-cursors
+    #hyprlandPlugins.hyprgrass
 
 
     bluez
@@ -402,8 +407,13 @@ in
 
     hyprland = {
       enable = true;
-      portalPackage = pkgs-stable.xdg-desktop-portal-hyprland; # xdph none git
       xwayland.enable = true;
+      package = inputs.hyprland.packages.${pkgs-stable.stdenv.hostPlatform.system}.hyprland;
+      portalPackage = inputs.hyprland.packages.${pkgs-stable.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+      plugins = [
+        inputs.hypr-dynamic-cursors.packages.${pkgs-stable.stdenv.hostPlatform.system}.hypr-dynamic-cursors
+        inputs.hyprgrass.packages.${pkgs-stable.stdenv.hostPlatform.system}.default
+      ];
     };
 
     waybar.enable = true;
@@ -444,9 +454,6 @@ in
   xdg.portal = {
     enable = true;
     wlr.enable = false;
-    extraPortals = [
-      pkgs-stable.xdg-desktop-portal-hyprland
-    ];
     config = {
       hyprland = {
         default = [ "hyprland" ];
@@ -458,9 +465,6 @@ in
     ];
   };
   
-  # Set your time zone.
-  time.timeZone = "Asia/Tehran";
-
     networking.proxy.default = "${httpProxy}";
     networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain,::1";
 
@@ -478,6 +482,10 @@ in
     https_proxy = "${httpProxy}";
     all_proxy = "${httpProxy}";
     no_proxy = "127.0.0.1,localhost,internal.domain,::1";
+    HTTP_PROXY = "${httpProxy}";
+    HTTPS_PROXY = "${httpProxy}";
+    ALL_PROXY = "${httpProxy}";
+    NO_PROXY = "127.0.0.1,localhost,internal.domain,::1";
     EDITOR = "nvim";
     SSL_CERT_FILE = "${pkgs-stable.cacert}/etc/ssl/certs/ca-bundle.crt";
     CURL_CA_BUNDLE = "${pkgs-stable.cacert}/etc/ssl/certs/ca-bundle.crt";
@@ -536,6 +544,18 @@ in
   };
 
   services = {
+    timesyncd.enable = false;
+
+    chrony = {
+      enable = true;
+      servers = [
+        "129.6.15.28"
+        "129.6.15.29"
+        "132.163.96.1"
+        "132.163.96.2"
+      ];
+    };
+
     logind.settings = {
       Login = {
         HandlePowerKey = "ignore";

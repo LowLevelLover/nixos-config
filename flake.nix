@@ -5,6 +5,16 @@
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     ags.url = "github:aylur/ags/v1";
+
+    hyprland.url = "github:hyprwm/Hyprland";
+    hypr-dynamic-cursors = {
+      url = "github:VirtCode/hypr-dynamic-cursors";
+      inputs.hyprland.follows = "hyprland";
+    };
+    hyprgrass = {
+      url = "github:horriblename/hyprgrass";
+      inputs.hyprland.follows = "hyprland";
+    };
   };
 
   outputs = inputs @ { self, nixpkgs-stable, nixpkgs-unstable, ... }:
