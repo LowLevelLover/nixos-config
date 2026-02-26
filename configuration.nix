@@ -44,6 +44,7 @@ in
       # "modprobe.blacklist=sp5100_tco" #watchdog for AMD
       "modprobe.blacklist=iTCO_wdt" #watchdog for Intel
       "nvidia-drm.modeset=1"
+      "iwlwifi.power_save=0"
  	  ];
 
     kernel.sysctl = {
@@ -57,6 +58,7 @@ in
     kernelModules = [ "v4l2loopback" "snd_hda_intel" "vboxdrv" "hid_apple" ];
     extraModprobeConfig = ''
         options hid_apple fnmode=2
+        options snd_hda_intel power_save=0
     '';
     extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
     
@@ -278,6 +280,7 @@ in
     gnome-disk-utility
     nmap
     zeal
+    discord
 
     # VPN
     #hiddify-app
@@ -308,8 +311,7 @@ in
     fdk_aac
 
     # JetBrains
-    jetbrains.idea-community-bin
-    jetbrains.idea-ultimate
+    jetbrains.idea
 
     # Kotlin
     openjdk17
@@ -395,6 +397,7 @@ in
     jujutsu
     yaak
     zed-editor
+    antigravity-fhs
   ]);
 
   programs = {
@@ -585,6 +588,15 @@ in
       pulse.enable = true;
       jack.enable = true;
       wireplumber.enable = true;
+
+      extraConfig.pipewire."99-audio" = {
+        "context.properties" = {
+          "default.clock.rate" = 48000;
+          "default.clock.quantum" = 1024;
+          "default.clock.min-quantum" = 512;
+          "default.clock.max-quantum" = 2048;
+        };
+      };
     };
 
     udev.enable = true;
