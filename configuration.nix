@@ -403,9 +403,7 @@ in
     jujutsu
     yaak
     zed-editor
-    antigravity-fhs
     github-copilot-cli
-    claude-code
   ]);
 
   programs = {
