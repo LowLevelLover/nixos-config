@@ -5,7 +5,7 @@
 
 # Must set this ip as .env
 let
-  httpProxy = "http://192.168.70.166:10809";
+  httpProxy = "http://10.99.124.235:10809";
 
   python-packages = pkgs-stable.python3.withPackages (
     ps:
@@ -281,6 +281,12 @@ in
     nmap
     zeal
     discord
+    deltachat-desktop
+    proxychains-ng
+    lutris
+    wineWowPackages.stable
+    winetricks
+    sing-box
 
     # VPN
     #hiddify-app
@@ -360,7 +366,7 @@ in
     xarchiver
     yad
     yt-dlp
-    xdg-desktop-portal
+    #xdg-desktop-portal
     hyprland-qt-support
     hyprcursor
     # hyprlandPlugins.hypr-dynamic-cursors
@@ -398,6 +404,8 @@ in
     yaak
     zed-editor
     antigravity-fhs
+    github-copilot-cli
+    claude-code
   ]);
 
   programs = {
@@ -458,13 +466,13 @@ in
     enable = true;
     wlr.enable = false;
     config = {
+      common.default = "hyprland";
       hyprland = {
         default = [ "hyprland" ];
       };
     };
     configPackages = [
-      pkgs-stable.xdg-desktop-portal-gtk
-      pkgs-stable.xdg-desktop-portal
+      pkgs-stable.xdg-desktop-portal-hyprland
     ];
   };
   
