@@ -5,7 +5,7 @@
 
 # Must set this ip as .env
 let
-  httpProxy = "http://10.99.124.235:10809";
+  httpProxy = "http://10.70.96.36:10809";
 
   python-packages = pkgs-stable.python3.withPackages (
     ps:
@@ -194,6 +194,7 @@ in
 
   fonts.packages = with pkgs-stable; [
     nerd-fonts.fira-code
+    ibm-plex
   ];
 
   users.extraGroups.vboxusers.members = [ "farzin" ];
@@ -286,11 +287,16 @@ in
     lutris
     wineWowPackages.stable
     winetricks
-    sing-box
+    anki
+    legcord
+    typst
+    pandoc
+    texlive.combined.scheme-full
 
     # VPN
     #hiddify-app
     v2raya
+    sing-box
 
     # Qt platform plugins
     qt5.qtbase
@@ -401,9 +407,9 @@ in
     code-cursor
     zellij
     jujutsu
-    yaak
     zed-editor
     github-copilot-cli
+    super-productivity
   ]);
 
   programs = {
