@@ -235,7 +235,6 @@ in
     zoxide
     variety
     yazi
-    telegram-desktop
     cmake
     meson
     cpio
@@ -299,10 +298,7 @@ in
     sing-box
 
     # Qt platform plugins
-    qt5.qtbase
     qt5.qtwayland
-    qt5.qttools
-    qt5.qtquickcontrols2
 
     # For X11 support
     xorg.libX11
@@ -358,11 +354,9 @@ in
     polkit_gnome
     libsForQt5.qt5ct
     kdePackages.qt6ct
-    kdePackages.qtwayland
     kdePackages.qtstyleplugin-kvantum #kvantum
     rofi
     slurp
-    swappy
     swaynotificationcenter
     swww
     unzip
@@ -375,6 +369,8 @@ in
     #xdg-desktop-portal
     hyprland-qt-support
     hyprcursor
+    hyprdim
+    satty
     # hyprlandPlugins.hypr-dynamic-cursors
     #hyprlandPlugins.hyprgrass
 
@@ -410,6 +406,7 @@ in
     zed-editor
     github-copilot-cli
     super-productivity
+    telegram-desktop
   ]);
 
   programs = {
@@ -731,6 +728,10 @@ in
     XDG_SESSION_TYPE = "wayland";
     XDG_CURRENT_DESKTOP = "Hyprland";
     XDG_SESSION_DESKTOP = "Hyprland";
+
+    QT_QPA_PLATFORM = "wayland;xcb";
+    QT_PLUGIN_PATH = "";
+    QT_QPA_PLATFORMTHEME = "qt5ct";
   };
 
   # Copy the NixOS configuration file and link it from the resulting system
