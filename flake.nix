@@ -85,6 +85,7 @@
           {
             environment.systemPackages = with pkgs; [
               (callPackage ./pkgs/ktea.nix {})
+              (callPackage ./pkgs/rtk.nix {})
             ];
           }
         ];

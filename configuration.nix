@@ -280,7 +280,6 @@ in
     gnome-disk-utility
     nmap
     zeal
-    discord
     deltachat-desktop
     proxychains-ng
     lutris
@@ -291,6 +290,7 @@ in
     typst
     pandoc
     texlive.combined.scheme-full
+    boring
 
     # VPN
     #hiddify-app
@@ -397,6 +397,9 @@ in
     basedpyright
     python3Packages.debugpy
 
+    # AI
+    ollama-cuda
+
     ]) ++ [
   	  python-packages
   ] ++ (with pkgs-unstable; [
@@ -405,6 +408,8 @@ in
     jujutsu
     zed-editor
     github-copilot-cli
+    claude-code
+    codex
     super-productivity
     telegram-desktop
   ]);
