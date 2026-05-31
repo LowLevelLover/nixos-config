@@ -291,6 +291,7 @@ in
     pandoc
     texlive.combined.scheme-full
     boring
+    inetutils
 
     # VPN
     #hiddify-app
@@ -404,6 +405,7 @@ in
   	  python-packages
   ] ++ (with pkgs-unstable; [
     code-cursor
+    cursor-cli
     zellij
     jujutsu
     zed-editor
