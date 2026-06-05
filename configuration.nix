@@ -5,7 +5,7 @@
 
 # Must set this ip as .env
 let
-  httpProxy = "http://10.70.96.36:10809";
+  httpProxy = "http://192.168.29.45:10809";
 
   python-packages = pkgs-stable.python3.withPackages (
     ps:
@@ -23,13 +23,11 @@ in
     ];
 
   nix.settings = {
-    download-attempts = 8;
-    http-connections = 32;
-    stalled-download-timeout = 300;
+    download-attempts = 20;
+    http-connections = 30;
+    stalled-download-timeout = 600;
     connect-timeout = 60;
-    max-jobs = 1;
     # builders-use-substitutes = true;
-    # http-connections = 1;
   };
 
   boot = {
@@ -44,6 +42,7 @@ in
       # "modprobe.blacklist=sp5100_tco" #watchdog for AMD
       "modprobe.blacklist=iTCO_wdt" #watchdog for Intel
       "nvidia-drm.modeset=1"
+      "nvidia-drm.fbdev=1"
       "iwlwifi.power_save=0"
  	  ];
 
@@ -265,7 +264,6 @@ in
     ripgrep
     xclip
     nodejs
-    nodePackages.npm
     kubectl
     krew
     hyprshot
@@ -283,7 +281,7 @@ in
     deltachat-desktop
     proxychains-ng
     lutris
-    wineWowPackages.stable
+    wineWow64Packages.stable
     winetricks
     anki
     legcord
@@ -302,10 +300,10 @@ in
     qt5.qtwayland
 
     # For X11 support
-    xorg.libX11
-    xorg.libxcb
-    xorg.xcbutil
-    xorg.libXrender
+    libx11
+    libxcb
+    libxcb-util
+    libxrender
 
     # GStreamer
     gst_all_1.gstreamer
@@ -359,7 +357,7 @@ in
     rofi
     slurp
     swaynotificationcenter
-    swww
+    awww
     unzip
     wallust
     wl-clipboard
@@ -442,8 +440,8 @@ in
     git.enable = true;
     nm-applet.indicator = true;
     thunar.enable = true;
-    thunar.plugins = with pkgs-stable.xfce; [
-		  exo
+    thunar.plugins = with pkgs-stable; [
+		  xfce4-exo
 		  mousepad
 		  thunar-archive-plugin
 		  thunar-volman
@@ -582,7 +580,6 @@ in
     };
 
     asusd.enable = true;
-    asusd.enableUserService = true;
     supergfxd.enable = true;
 
     v2raya.enable = true;
@@ -653,9 +650,10 @@ in
 
     gvfs.enable = true;
   
-    displayManager.gdm = {
-      enable = true;
-      wayland = true;
+    displayManager = {
+      #gdm.enable = true;
+      sddm.enable = true;
+      sddm.wayland.enable = true;
     };
   };
 
@@ -730,6 +728,8 @@ in
     ];
   };
 
+  services.displayManager.defaultSession = "hyprland";
+
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
     XDG_SESSION_TYPE = "wayland";
@@ -739,6 +739,10 @@ in
     QT_QPA_PLATFORM = "wayland;xcb";
     QT_PLUGIN_PATH = "";
     QT_QPA_PLATFORMTHEME = "qt5ct";
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    LIBVA_DRIVER_NAME = "nvidia";
+    WLR_NO_HARDWARE_CURSORS = "1";
   };
 
   # Copy the NixOS configuration file and link it from the resulting system
