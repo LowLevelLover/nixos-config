@@ -38,12 +38,14 @@ in
     kernelParams = [
       "systemd.mask=systemd-vconsole-setup.service"
       "systemd.mask=dev-tpmrm0.device" #this is to mask that stupid 1.5 mins systemd bug
-      "nowatchdog" 
-      # "modprobe.blacklist=sp5100_tco" #watchdog for AMD
+      "nowatchdog"
       "modprobe.blacklist=iTCO_wdt" #watchdog for Intel
       "nvidia-drm.modeset=1"
       "nvidia-drm.fbdev=1"
+      "mem_sleep_default=deep"
       "iwlwifi.power_save=0"
+      "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+      "module_blacklist=mei_wdt"
  	  ];
 
     kernel.sysctl = {
@@ -137,7 +139,7 @@ in
     # Fine-grained power management. Turns off GPU when not in use.
     # Experimental and only works on modern Nvidia GPUs (Turing or newer).
     powerManagement.finegrained = true;
-    
+
     #dynamicBoost.enable = true; # Dynamic Boost
 
     nvidiaPersistenced = false;
@@ -290,10 +292,10 @@ in
     texlive.combined.scheme-full
     boring
     inetutils
+    nil
+    nixd
 
     # VPN
-    #hiddify-app
-    v2raya
     sing-box
 
     # Qt platform plugins
@@ -587,12 +589,14 @@ in
     tlp = {
       enable = true;
       settings = {
-        "START_CHARGE_THRESH_BAT0" = 40;
+        "START_CHARGE_THRESH_BAT0" = 30;
         "STOP_CHARGE_THRESH_BAT0" = 80;
-        "INTEL_GPU_MIN_FREQ_ON_AC" = 500;
-        "INTEL_GPU_MIN_FREQ_ON_BAT" = 500;
+        RUNTIME_PM_ON_AC = "auto";
+        RUNTIME_PM_ON_BAT = "auto";
       };
     };
+
+    thermald.enable = true;
 
     pipewire = {
       enable = true;
@@ -739,9 +743,6 @@ in
     QT_QPA_PLATFORM = "wayland;xcb";
     QT_PLUGIN_PATH = "";
     QT_QPA_PLATFORMTHEME = "qt5ct";
-    GBM_BACKEND = "nvidia-drm";
-    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    LIBVA_DRIVER_NAME = "nvidia";
     WLR_NO_HARDWARE_CURSORS = "1";
   };
 
