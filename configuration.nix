@@ -352,7 +352,6 @@ in
     pamixer
     pavucontrol
     playerctl
-    polkit_gnome
     libsForQt5.qt5ct
     kdePackages.qt6ct
     kdePackages.qtstyleplugin-kvantum #kvantum
@@ -551,6 +550,20 @@ in
       }
     })
   '';
+
+  # Wayland-native polkit authentication agent for Hyprland. polkit-gnome
+  # (deprecated GTK/X11) often fails to show its dialog under Wayland, which
+  # breaks pkexec-based privilege escalation (e.g. GenyConnect's TUN helper).
+  systemd.user.services.hyprpolkitagent = {
+    description = "Hyprland Polkit Authentication Agent";
+    wantedBy = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs-stable.hyprpolkitagent}/libexec/hyprpolkitagent";
+      Restart = "on-failure";
+    };
+  };
 
   security.wrappers.newuidmap = {
     source = "${pkgs-stable.shadow}/bin/newuidmap";
