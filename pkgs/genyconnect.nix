@@ -1,5 +1,6 @@
 { stdenv, appimageTools, fetchurl, lib, autoPatchelfHook, makeWrapper
-, symlinkJoin, qt6, libglvnd, e2fsprogs }:
+, symlinkJoin, qt6, libglvnd, e2fsprogs
+, iproute2, iptables, nftables, procps, coreutils, gnugrep, gawk }:
 
 let
   pname = "genyconnect";
@@ -70,6 +71,21 @@ stdenv.mkDerivation {
       --set QT_PLUGIN_PATH ${qtEnv}/lib/qt-6/plugins \
       --set QML2_IMPORT_PATH ${qtEnv}/lib/qt-6/qml \
       --set QML_IMPORT_PATH ${qtEnv}/lib/qt-6/qml
+
+    # The GUI launches the TUN helper as root via `pkexec env LD_LIBRARY_PATH=… \
+    # GenyConnectTunHelper …`. pkexec resets PATH to a fixed safe value
+    # (/usr/sbin:/usr/bin:/sbin:/bin), none of which exist meaningfully on NixOS,
+    # so the helper's QProcess/findExecutable calls for `ip` (route/rule/addr) and
+    # friends fail and the tunnel can't be configured. Wrap the helper in place so
+    # the elevated process gets iproute2 et al. on PATH. The real binary stays in
+    # the same bin/ dir, so applicationDirPath() still resolves sibling xray-core.
+    mv $out/libexec/genyconnect/bin/GenyConnectTunHelper \
+       $out/libexec/genyconnect/bin/.GenyConnectTunHelper-wrapped
+    makeWrapper $out/libexec/genyconnect/bin/.GenyConnectTunHelper-wrapped \
+                $out/libexec/genyconnect/bin/GenyConnectTunHelper \
+      --prefix PATH : ${lib.makeBinPath [
+        iproute2 iptables nftables procps coreutils gnugrep gawk
+      ]}
 
     install -Dm444 ${appimageContents}/genyconnect.desktop $out/share/applications/genyconnect.desktop 2>/dev/null || true
     cp -r ${appimageContents}/usr/share/icons $out/share/icons 2>/dev/null || true
