@@ -15,6 +15,7 @@
       url = "github:horriblename/hyprgrass";
       inputs.hyprland.follows = "hyprland";
     };
+    thyx.url = "github:rccyx/thyx";
   };
 
   outputs = inputs @ { self, nixpkgs-stable, nixpkgs-unstable, ... }:
@@ -81,6 +82,12 @@
 
         modules = [
           ./configuration.nix
+          inputs.thyx.nixosModules.default
+
+          {
+            services.displayManager.sddm.thyx.enable = true;
+            services.displayManager.sddm.wayland.enable = true;
+          }
 
           {
             environment.systemPackages = with pkgs; [

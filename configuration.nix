@@ -1,11 +1,11 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, pkgs-stable, pkgs-unstable, host, username, options, lib, inputs, system, ... }:
+{ config, pkgs-stable, pkgs-unstable, inputs, ... }:
 
 # Must set this ip as .env
 let
-  httpProxy = "http://127.0.0.1:10808";
+  httpProxy = "http://192.168.29.45:10809";
 
   python-packages = pkgs-stable.python3.withPackages (
     ps:
