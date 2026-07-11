@@ -22,14 +22,6 @@ in
       inputs.hyprland.nixosModules.default
     ];
 
-  nix.settings = {
-    download-attempts = 20;
-    http-connections = 30;
-    stalled-download-timeout = 600;
-    connect-timeout = 60;
-    # builders-use-substitutes = true;
-  };
-
   boot = {
     # kernelPackages = pkgs-stable.linuxPackages_zen; # zen Kernel
     # kernelPackages = pkgs-stable.linuxPackages_latest; # Kernel 
@@ -294,6 +286,7 @@ in
     inetutils
     nil
     nixd
+    slack
 
     # VPN
     sing-box
@@ -597,8 +590,6 @@ in
     asusd.enable = true;
     supergfxd.enable = true;
 
-    v2raya.enable = true;
-
     tlp = {
       enable = true;
       settings = {
@@ -683,6 +674,11 @@ in
 
   nix = {
     settings = {
+      download-attempts = 20;
+      http-connections = 30;
+      stalled-download-timeout = 600;
+      connect-timeout = 60;
+
       auto-optimise-store = true;
       experimental-features = [
         "nix-command"
