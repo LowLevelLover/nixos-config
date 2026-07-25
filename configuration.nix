@@ -5,7 +5,7 @@
 
 # Must set this ip as .env
 let
-  httpProxy = "http://192.168.29.45:10809";
+  httpProxy = "http://10.59.28.217:10809";
 
   python-packages = pkgs-stable.python3.withPackages (
     ps:
