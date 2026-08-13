@@ -7,14 +7,31 @@
     ags.url = "github:aylur/ags/v1";
 
     hyprland.url = "github:hyprwm/Hyprland";
-    hypr-dynamic-cursors = {
-      url = "github:VirtCode/hypr-dynamic-cursors";
-      inputs.hyprland.follows = "hyprland";
+
+    # Hyprland ecosystem pieces, pinned to the SAME dependency set as the
+    # Hyprland flake above. Without these `follows`, each flake would pull its
+    # own hyprutils/hyprlang/aquamarine and you can end up with a portal or
+    # polkit agent built against a different ABI than the running compositor.
+    xdg-desktop-portal-hyprland = {
+      url = "github:hyprwm/xdg-desktop-portal-hyprland";
+      inputs.nixpkgs.follows = "hyprland/nixpkgs";
+      inputs.systems.follows = "hyprland/systems";
+      inputs.hyprland-protocols.follows = "hyprland/hyprland-protocols";
+      inputs.hyprlang.follows = "hyprland/hyprlang";
+      inputs.hyprutils.follows = "hyprland/hyprutils";
+      inputs.hyprwayland-scanner.follows = "hyprland/hyprwayland-scanner";
     };
-    hyprgrass = {
-      url = "github:horriblename/hyprgrass";
-      inputs.hyprland.follows = "hyprland";
+
+    hyprpolkitagent = {
+      url = "github:hyprwm/hyprpolkitagent";
+      inputs.nixpkgs.follows = "hyprland/nixpkgs";
+      inputs.systems.follows = "hyprland/systems";
+      inputs.hyprutils.follows = "hyprland/hyprutils";
+      inputs.hyprlang.follows = "hyprland/hyprlang";
+      inputs.hyprgraphics.follows = "hyprland/hyprgraphics";
+      inputs.aquamarine.follows = "hyprland/aquamarine";
     };
+
     thyx.url = "github:rccyx/thyx";
   };
 
@@ -92,7 +109,6 @@
           {
             environment.systemPackages = with pkgs; [
               (callPackage ./pkgs/ktea.nix {})
-              (callPackage ./pkgs/rtk.nix {})
               (callPackage ./pkgs/codegraph.nix {})
               (callPackage ./pkgs/genyconnect.nix {})
               (callPackage ./pkgs/orca.nix {})

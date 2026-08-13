@@ -5,7 +5,7 @@
 
 # Must set this ip as .env
 let
-  httpProxy = "http://10.59.28.217:10809";
+  httpProxy = "http://127.0.0.1:10808";
 
   python-packages = pkgs-stable.python3.withPackages (
     ps:
@@ -287,6 +287,8 @@ in
     nil
     nixd
     slack
+    thunderbird
+    mailspring
 
     # VPN
     sing-box
@@ -406,6 +408,7 @@ in
     codex
     super-productivity
     telegram-desktop
+    v2rayn
   ]);
 
   programs = {
@@ -420,11 +423,9 @@ in
       enable = true;
       xwayland.enable = true;
       package = inputs.hyprland.packages.${pkgs-stable.stdenv.hostPlatform.system}.hyprland;
-      portalPackage = inputs.hyprland.packages.${pkgs-stable.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
-      plugins = [
-        inputs.hypr-dynamic-cursors.packages.${pkgs-stable.stdenv.hostPlatform.system}.hypr-dynamic-cursors
-        inputs.hyprgrass.packages.${pkgs-stable.stdenv.hostPlatform.system}.default
-      ];
+      # From the dedicated xdg-desktop-portal-hyprland flake, which follows the
+      # same hyprutils/hyprlang/hyprland-protocols as the Hyprland flake above.
+      portalPackage = inputs.xdg-desktop-portal-hyprland.packages.${pkgs-stable.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     };
 
     waybar.enable = true;
@@ -471,8 +472,11 @@ in
         default = [ "hyprland" ];
       };
     };
+    # NOTE: this used to be pkgs-stable.xdg-desktop-portal-hyprland, i.e. the
+    # nixos-26.05 build, while the compositor came from the Hyprland flake --
+    # a version skew between the portal and the compositor it talks to.
     configPackages = [
-      pkgs-stable.xdg-desktop-portal-hyprland
+      inputs.xdg-desktop-portal-hyprland.packages.${pkgs-stable.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland
     ];
   };
   
@@ -547,14 +551,31 @@ in
   # Wayland-native polkit authentication agent for Hyprland. polkit-gnome
   # (deprecated GTK/X11) often fails to show its dialog under Wayland, which
   # breaks pkexec-based privilege escalation (e.g. GenyConnect's TUN helper).
+  #
+  # NOTE: this previously used pkgs-stable.hyprpolkitagent (0.1.3, Qt-based),
+  # which crash-looped at login with:
+  #   Failed to create wl_display (Connection refused)
+  #   Could not load the Qt platform plugin "wayland" ... no Qt platform plugin
+  # and then hit the systemd start limit, leaving the session with NO polkit
+  # agent at all. The upstream flake build is hyprtoolkit-based (no Qt), and is
+  # pinned to the same hyprutils/hyprlang/aquamarine as the compositor.
+  #
+  # It is still started when graphical-session.target is reached, but Hyprland
+  # also restarts it from UserConfigs/Startup_Apps.lua once WAYLAND_DISPLAY has
+  # been exported into the systemd user environment -- that ordering is what the
+  # old unit was racing against.
   systemd.user.services.hyprpolkitagent = {
     description = "Hyprland Polkit Authentication Agent";
     wantedBy = [ "graphical-session.target" ];
     after = [ "graphical-session.target" ];
     partOf = [ "graphical-session.target" ];
+    startLimitBurst = 10;
+    startLimitIntervalSec = 60;
     serviceConfig = {
-      ExecStart = "${pkgs-stable.hyprpolkitagent}/libexec/hyprpolkitagent";
+      Type = "simple";
+      ExecStart = "${inputs.hyprpolkitagent.packages.${pkgs-stable.stdenv.hostPlatform.system}.hyprpolkitagent}/libexec/hyprpolkitagent";
       Restart = "on-failure";
+      RestartSec = 2;
     };
   };
 
