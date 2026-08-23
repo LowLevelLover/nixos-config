@@ -288,7 +288,6 @@ in
     nixd
     slack
     thunderbird
-    mailspring
 
     # VPN
     sing-box
@@ -366,9 +365,7 @@ in
     hyprcursor
     hyprdim
     satty
-    # hyprlandPlugins.hypr-dynamic-cursors
-    #hyprlandPlugins.hyprgrass
-
+    gh
 
     bluez
     bluez-tools
@@ -409,6 +406,7 @@ in
     super-productivity
     telegram-desktop
     v2rayn
+    fooyin
   ]);
 
   programs = {
