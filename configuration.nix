@@ -316,9 +316,12 @@ in
     # JetBrains
     jetbrains.idea
 
-    # Kotlin
-    openjdk17
-    gradle
+    # Kotlin / JVM (Java 25 LTS for Spring Boot 4 + Kotlin 2)
+    openjdk25
+    # nixpkgs' `gradle` is 8.14, which refuses to run on a Java 25 JVM.
+    # Gradle 9 supports it, but its wrapper pins its own JDK, so point that
+    # at 25 as well or the daemon comes up on an older runtime.
+    (gradle_9.override { java = openjdk25; })
     kotlin
     kotlin-language-server
 
@@ -774,6 +777,10 @@ in
     QT_PLUGIN_PATH = "";
     QT_QPA_PLATFORMTHEME = "qt5ct";
     WLR_NO_HARDWARE_CURSORS = "1";
+
+    # Gradle, Maven and IntelliJ all fall back to JAVA_HOME when no toolchain
+    # is pinned; without it they pick whatever `java` happens to be on PATH.
+    JAVA_HOME = "${pkgs-stable.openjdk25}";
   };
 
   # Copy the NixOS configuration file and link it from the resulting system
