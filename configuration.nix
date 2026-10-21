@@ -32,11 +32,10 @@ in
       "systemd.mask=dev-tpmrm0.device" #this is to mask that stupid 1.5 mins systemd bug
       "nowatchdog"
       "modprobe.blacklist=iTCO_wdt" #watchdog for Intel
-      "nvidia-drm.modeset=1"
-      "nvidia-drm.fbdev=1"
+      # nvidia-drm modeset/fbdev and NVreg_PreserveVideoMemoryAllocations are
+      # already set by hardware.nvidia.{modesetting,powerManagement}.enable.
       "mem_sleep_default=deep"
       "iwlwifi.power_save=0"
-      "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
       "module_blacklist=mei_wdt"
  	  ];
 
@@ -81,10 +80,7 @@ in
     ## -end of BOOTLOADERS----- ##
   
     # Make /tmp a tmpfs
-    tmp = {
-      useTmpfs = false;
-      tmpfsSize = "30%";
-      };
+    tmp.useTmpfs = false;
     
     # Appimage Support
     binfmt.registrations.appimage = {
@@ -210,10 +206,8 @@ in
     vim
     qt6.qtwayland
     libinput
-    seatd
     unrar
     ntfs3g
-    zellij
     bat
     git
     fish
@@ -234,7 +228,6 @@ in
     asusctl
     supergfxctl
     pkg-config
-    tlp
     ninja
     udis86
     wayland-protocols
@@ -365,7 +358,6 @@ in
     #xdg-desktop-portal
     hyprland-qt-support
     hyprcursor
-    hyprdim
     satty
     gh
 
@@ -683,8 +675,6 @@ in
     openssh.enable = true;
     xserver.videoDrivers = [ "nvidia" ];
 
-    seatd.enable = true;
-
     gvfs.enable = true;
   
     displayManager = {
@@ -696,10 +686,9 @@ in
 
   security.pam.services.hyprlock = {};
 
-  powerManagement = {
-  	enable = true;
-	  cpuFreqGovernor = "schedutil";
-  };
+  # CPU governor is left to TLP: intel_pstate only offers performance/powersave,
+  # so cpuFreqGovernor = "schedutil" was silently ignored.
+  powerManagement.enable = true;
 
   nix = {
     settings = {
@@ -726,8 +715,6 @@ in
   # Virtualization / Containers
   virtualisation = {
     virtualbox.host.enable = true;
-    virtualbox.guest.enable = true;
-    virtualbox.guest.dragAndDrop = true;
 
     containers.enable = true;
     containers.storage.settings = {
@@ -781,9 +768,7 @@ in
     XDG_SESSION_DESKTOP = "Hyprland";
 
     QT_QPA_PLATFORM = "wayland;xcb";
-    QT_PLUGIN_PATH = "";
-    QT_QPA_PLATFORMTHEME = "qt5ct";
-    WLR_NO_HARDWARE_CURSORS = "1";
+    QT_QPA_PLATFORMTHEME = "qt6ct"; # matches hypr/UserConfigs/ENVariables.lua
 
     # Gradle, Maven and IntelliJ all fall back to JAVA_HOME when no toolchain
     # is pinned; without it they pick whatever `java` happens to be on PATH.
