@@ -20,6 +20,7 @@
       inputs.hyprlang.follows = "hyprland/hyprlang";
       inputs.hyprutils.follows = "hyprland/hyprutils";
       inputs.hyprwayland-scanner.follows = "hyprland/hyprwayland-scanner";
+      inputs.hyprtoolkit.follows = "hyprland/hyprtoolkit";
     };
 
     hyprpolkitagent = {
@@ -30,6 +31,7 @@
       inputs.hyprlang.follows = "hyprland/hyprlang";
       inputs.hyprgraphics.follows = "hyprland/hyprgraphics";
       inputs.aquamarine.follows = "hyprland/aquamarine";
+      inputs.hyprtoolkit.follows = "hyprland/hyprtoolkit";
     };
 
     thyx.url = "github:rccyx/thyx";
