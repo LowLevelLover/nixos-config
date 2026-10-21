@@ -395,7 +395,10 @@ in
     jujutsu
     zed-editor
     github-copilot-cli
-    claude-code
+    # Why: the claude wrapper exports LD_LIBRARY_PATH=<alsa-lib>, which every
+    # child process inherits. Unstable's alsa-lib needs a newer glibc than the
+    # system/FHS envs (e.g. Orca) provide, so pin it to the stable build.
+    (claude-code.override { alsa-lib = pkgs-stable.alsa-lib; })
     codex
     super-productivity
     telegram-desktop

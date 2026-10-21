@@ -105,9 +105,7 @@
 
           {
             environment.systemPackages = with pkgs; [
-              (callPackage ./pkgs/ktea.nix {})
               (callPackage ./pkgs/codegraph.nix {})
-              (callPackage ./pkgs/genyconnect.nix {})
               (callPackage ./pkgs/orca.nix {})
             ];
           }

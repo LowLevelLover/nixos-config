@@ -2,11 +2,11 @@
 
 stdenv.mkDerivation rec {
   pname = "codegraph";
-  version = "1.1.6";
+  version = "1.6.2";
 
   src = fetchurl {
     url = "https://github.com/colbymchenry/codegraph/releases/download/v${version}/codegraph-linux-x64.tar.gz";
-    sha256 = "sha256-+rfx9stB8oJkiLRBHy68Ntp5km0ryg04IPT1EKvP0UM=";
+    sha256 = "sha256-7wr0FgkhKPsczHI3hgALft9KaXH+YErNCL+Wbk83uCg=";
   };
 
   # The archive bundles its own Node 24 runtime (a single ELF `node` binary,
