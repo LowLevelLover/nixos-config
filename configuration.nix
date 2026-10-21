@@ -272,7 +272,6 @@ in
     gnome-disk-utility
     nmap
     zeal
-    deltachat-desktop
     proxychains-ng
     lutris
     wineWow64Packages.stable
