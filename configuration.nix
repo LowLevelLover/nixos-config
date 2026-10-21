@@ -428,6 +428,11 @@ in
       portalPackage = inputs.xdg-desktop-portal-hyprland.packages.${pkgs-stable.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     };
 
+    # Installs waybar plus a systemd user unit WantedBy graphical-session.target.
+    # Newer Hyprland activates graphical-session.target, so that unit now starts
+    # on login -- on top of `waybar` from hypr/UserConfigs/Startup_Apps.lua,
+    # giving two bars. Waybar is launched/restarted by the Hyprland scripts
+    # (Startup_Apps.lua, Refresh.sh), so the unit is unhooked below.
     waybar.enable = true;
     firefox.enable = true;
     fish.enable = true;
@@ -564,6 +569,9 @@ in
   # also restarts it from UserConfigs/Startup_Apps.lua once WAYLAND_DISPLAY has
   # been exported into the systemd user environment -- that ordering is what the
   # old unit was racing against.
+  # See programs.waybar above: started by Hyprland, not by systemd.
+  systemd.user.services.waybar.wantedBy = pkgs-stable.lib.mkForce [ ];
+
   systemd.user.services.hyprpolkitagent = {
     description = "Hyprland Polkit Authentication Agent";
     wantedBy = [ "graphical-session.target" ];
