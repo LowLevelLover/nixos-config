@@ -621,6 +621,9 @@ in
         "STOP_CHARGE_THRESH_BAT0" = 80;
         RUNTIME_PM_ON_AC = "auto";
         RUNTIME_PM_ON_BAT = "auto";
+        # Turbo only burns battery (13650HX bursts to 100+ W); keep it on AC
+        CPU_BOOST_ON_AC = 1;
+        CPU_BOOST_ON_BAT = 0;
       };
     };
 
