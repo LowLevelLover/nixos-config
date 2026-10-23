@@ -13,6 +13,14 @@ let
         requests
       ]
   );
+
+  # Long-running GTK4/EGL clients probe every EGL vendor and Vulkan ICD at
+  # startup; NVIDIA's keep /dev/nvidia* open, which blocks RTD3 so the dGPU
+  # never powers off. Restrict such services to Mesa/Intel.
+  noNvidiaEnv = {
+    __EGL_VENDOR_LIBRARY_FILENAMES = "/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json";
+    VK_DRIVER_FILES = "/run/opengl-driver/share/vulkan/icd.d/intel_icd.x86_64.json";
+  };
 in
 {
 
@@ -123,7 +131,12 @@ in
     
     # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
     powerManagement.enable = true;
-    
+
+    # Defaults to true on 595+ open modules; the kernel-notifier path leaves the
+    # GPU stuck (NV_ERR_GPU_NOT_FULL_POWER) after hybrid-sleep and every later
+    # suspend fails. Use the nvidia-suspend/resume/hibernate services instead.
+    powerManagement.kernelSuspendNotifier = false;
+
     # Fine-grained power management. Turns off GPU when not in use.
     # Experimental and only works on modern Nvidia GPUs (Turing or newer).
     powerManagement.finegrained = true;
@@ -580,6 +593,20 @@ in
       Restart = "on-failure";
       RestartSec = 2;
     };
+    environment = noNvidiaEnv;
+  };
+
+  # swaync.service ships with the package (not systemd.packages), so add the
+  # environment as a drop-in instead of generating a unit without ExecStart.
+  # Raw text rather than systemd.user.services, which would also force the
+  # minimal default PATH and break commands run from swaync buttons/scripts.
+  systemd.user.units."swaync.service" = {
+    overrideStrategy = "asDropin";
+    text = ''
+      [Service]
+      Environment="__EGL_VENDOR_LIBRARY_FILENAMES=${noNvidiaEnv.__EGL_VENDOR_LIBRARY_FILENAMES}"
+      Environment="VK_DRIVER_FILES=${noNvidiaEnv.VK_DRIVER_FILES}"
+    '';
   };
 
   security.wrappers.newuidmap = {
