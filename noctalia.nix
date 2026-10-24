@@ -12,12 +12,36 @@ let
     s=$(${config.systemd.package}/bin/loginctl show-user "$UID" --property=Display --value)
     echo "''${s:+XDG_SESSION_ID=$s}" > "$1"
   '';
+
+  # The package puts /run/opengl-driver/lib on the RUNPATH only so the system
+  # monitor can dlopen NVML for dGPU stats. NVML then holds /dev/nvidia0 for
+  # good, and Noctalia opens it whenever the dGPU happens to be awake (after
+  # OBS/NVENC, or at a restart), so RTD3 never powers it down again. EGL comes
+  # from libglvnd with absolute vendor paths, so dropping the entry only hides
+  # NVML. Patching a copy keeps the Cachix build instead of compiling.
+  noctalia =
+    let
+      base = inputs.noctalia.packages.${pkgs-stable.stdenv.hostPlatform.system}.default;
+    in
+    pkgs-stable.runCommand base.name
+      {
+        nativeBuildInputs = [ pkgs-stable.patchelf ];
+        inherit (base) meta; # lib.getExe (the unit's ExecStart) needs mainProgram
+      }
+      ''
+        cp -a ${base} $out
+        chmod -R u+w $out
+        bin=$out/bin/.noctalia-wrapped
+        patchelf --set-rpath "$(patchelf --print-rpath $bin | tr : '\n' | grep -vxF /run/opengl-driver/lib | paste -sd:)" $bin
+        substituteInPlace $out/bin/noctalia --replace-fail ${base} $out
+      '';
 in
 {
   imports = [ inputs.noctalia.nixosModules.default ./noctalia-plugins.nix ];
 
   programs.noctalia = {
     enable = true;
+    package = noctalia;
     # Unit: noctalia.service, WantedBy/PartOf graphical-session.target.
     systemd.enable = true;
     # Not recommendedServices: it would enable power-profiles-daemon, which
