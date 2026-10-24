@@ -260,7 +260,6 @@ in
     nodejs
     kubectl
     krew
-    hyprshot
     mcron
     just
     typescript-language-server
@@ -325,11 +324,8 @@ in
     kotlin-language-server
 
     # Hyprland
-    ags # desktop overview  
     btop
     brightnessctl # for brightness control
-    cava
-    cliphist
     loupe
     gnome-system-monitor
     grim
@@ -340,33 +336,24 @@ in
     kitty
     ghostty
     libsForQt5.qtstyleplugin-kvantum #kvantum
-    networkmanagerapplet
-    nwg-displays
     nwg-look
     nvtopPackages.full	 
-    pamixer
     pavucontrol
     playerctl
-    libsForQt5.qt5ct
     kdePackages.qt6ct
     kdePackages.qtstyleplugin-kvantum #kvantum
     slurp
     awww
     unzip
-    wallust
     wl-clipboard
     xarchiver
-    yad
     yt-dlp
-    #xdg-desktop-portal
-    hyprland-qt-support
     hyprcursor
     satty
     gh
 
     bluez
     bluez-tools
-    blueman
     
     # C
     gcc
@@ -429,7 +416,6 @@ in
     firefox.enable = true;
     fish.enable = true;
     git.enable = true;
-    nm-applet.indicator = true;
     thunar.enable = true;
     thunar.plugins = with pkgs-stable; [
 		  xfce4-exo
@@ -440,8 +426,6 @@ in
 	  ];
 
     virt-manager.enable = true;
-
-    xwayland.enable = true;
 
     dconf.enable = true;
     seahorse.enable = true;
@@ -569,6 +553,7 @@ in
 
     logind.settings = {
       Login = {
+        # Hyprland binds XF86PowerOff to the Noctalia session menu (Laptops.lua).
         HandlePowerKey = "ignore";
       };
     };
@@ -728,7 +713,7 @@ in
     XDG_SESSION_DESKTOP = "Hyprland";
 
     QT_QPA_PLATFORM = "wayland;xcb";
-    QT_QPA_PLATFORMTHEME = "qt6ct"; # matches hypr/UserConfigs/ENVariables.lua
+    QT_QPA_PLATFORMTHEME = "qt6ct";
 
     # Gradle, Maven and IntelliJ all fall back to JAVA_HOME when no toolchain
     # is pinned; without it they pick whatever `java` happens to be on PATH.

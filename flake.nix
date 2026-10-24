@@ -4,7 +4,6 @@
   inputs = {
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    ags.url = "github:aylur/ags/v1";
 
     hyprland.url = "github:hyprwm/Hyprland";
 
