@@ -553,8 +553,9 @@ in
 
     logind.settings = {
       Login = {
-        # Hyprland binds XF86PowerOff to the Noctalia session menu (Laptops.lua).
-        HandlePowerKey = "ignore";
+        # The power key shuts down right away, no menu (also at the greeter).
+        # A block inhibitor, e.g. fwupd mid-flash, still stops it.
+        HandlePowerKey = "poweroff";
       };
     };
 
