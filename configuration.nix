@@ -13,14 +13,6 @@ let
         requests
       ]
   );
-
-  # Long-running GTK4/EGL clients probe every EGL vendor and Vulkan ICD at
-  # startup; NVIDIA's keep /dev/nvidia* open, which blocks RTD3 so the dGPU
-  # never powers off. Restrict such services to Mesa/Intel.
-  noNvidiaEnv = {
-    __EGL_VENDOR_LIBRARY_FILENAMES = "/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json";
-    VK_DRIVER_FILES = "/run/opengl-driver/share/vulkan/icd.d/intel_icd.x86_64.json";
-  };
 in
 {
 
@@ -28,6 +20,8 @@ in
     [
       ./hardware-configuration.nix
       inputs.hyprland.nixosModules.default
+      ./noctalia.nix # desktop shell: bar, notifications, launcher, lock, idle, polkit
+      ./greeter.nix # greetd + Noctalia Greeter login screen
     ];
 
   boot = {
@@ -340,7 +334,6 @@ in
     gnome-system-monitor
     grim
     gtk-engine-murrine #for gtk themes
-    hypridle
     imagemagick 
     inxi
     jq
@@ -357,14 +350,11 @@ in
     libsForQt5.qt5ct
     kdePackages.qt6ct
     kdePackages.qtstyleplugin-kvantum #kvantum
-    rofi
     slurp
-    swaynotificationcenter
     awww
     unzip
     wallust
     wl-clipboard
-    wlogout
     xarchiver
     yad
     yt-dlp
@@ -436,15 +426,8 @@ in
       portalPackage = inputs.xdg-desktop-portal-hyprland.packages.${pkgs-stable.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     };
 
-    # Installs waybar plus a systemd user unit WantedBy graphical-session.target.
-    # Newer Hyprland activates graphical-session.target, so that unit now starts
-    # on login -- on top of `waybar` from hypr/UserConfigs/Startup_Apps.lua,
-    # giving two bars. Waybar is launched/restarted by the Hyprland scripts
-    # (Startup_Apps.lua, Refresh.sh), so the unit is unhooked below.
-    waybar.enable = true;
     firefox.enable = true;
     fish.enable = true;
-    hyprlock.enable = true;
     git.enable = true;
     nm-applet.indicator = true;
     thunar.enable = true;
@@ -561,54 +544,6 @@ in
     })
   '';
 
-  # Wayland-native polkit authentication agent for Hyprland. polkit-gnome
-  # (deprecated GTK/X11) often fails to show its dialog under Wayland, which
-  # breaks pkexec-based privilege escalation (e.g. GenyConnect's TUN helper).
-  #
-  # NOTE: this previously used pkgs-stable.hyprpolkitagent (0.1.3, Qt-based),
-  # which crash-looped at login with:
-  #   Failed to create wl_display (Connection refused)
-  #   Could not load the Qt platform plugin "wayland" ... no Qt platform plugin
-  # and then hit the systemd start limit, leaving the session with NO polkit
-  # agent at all. The upstream flake build is hyprtoolkit-based (no Qt), and is
-  # pinned to the same hyprutils/hyprlang/aquamarine as the compositor.
-  #
-  # It is still started when graphical-session.target is reached, but Hyprland
-  # also restarts it from UserConfigs/Startup_Apps.lua once WAYLAND_DISPLAY has
-  # been exported into the systemd user environment -- that ordering is what the
-  # old unit was racing against.
-  # See programs.waybar above: started by Hyprland, not by systemd.
-  systemd.user.services.waybar.wantedBy = pkgs-stable.lib.mkForce [ ];
-
-  systemd.user.services.hyprpolkitagent = {
-    description = "Hyprland Polkit Authentication Agent";
-    wantedBy = [ "graphical-session.target" ];
-    after = [ "graphical-session.target" ];
-    partOf = [ "graphical-session.target" ];
-    startLimitBurst = 10;
-    startLimitIntervalSec = 60;
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = "${inputs.hyprpolkitagent.packages.${pkgs-stable.stdenv.hostPlatform.system}.hyprpolkitagent}/libexec/hyprpolkitagent";
-      Restart = "on-failure";
-      RestartSec = 2;
-    };
-    environment = noNvidiaEnv;
-  };
-
-  # swaync.service ships with the package (not systemd.packages), so add the
-  # environment as a drop-in instead of generating a unit without ExecStart.
-  # Raw text rather than systemd.user.services, which would also force the
-  # minimal default PATH and break commands run from swaync buttons/scripts.
-  systemd.user.units."swaync.service" = {
-    overrideStrategy = "asDropin";
-    text = ''
-      [Service]
-      Environment="__EGL_VENDOR_LIBRARY_FILENAMES=${noNvidiaEnv.__EGL_VENDOR_LIBRARY_FILENAMES}"
-      Environment="VK_DRIVER_FILES=${noNvidiaEnv.VK_DRIVER_FILES}"
-    '';
-  };
-
   security.wrappers.newuidmap = {
     source = "${pkgs-stable.shadow}/bin/newuidmap";
     setuid = true;
@@ -709,15 +644,9 @@ in
     xserver.videoDrivers = [ "nvidia" ];
 
     gvfs.enable = true;
-  
-    displayManager = {
-      #gdm.enable = true;
-      sddm.enable = true;
-      sddm.wayland.enable = true;
-    };
-  };
 
-  security.pam.services.hyprlock = {};
+    # Display manager: greetd + Noctalia Greeter, see greeter.nix.
+  };
 
   # CPU governor is left to TLP: intel_pstate only offers performance/powersave,
   # so cpuFreqGovernor = "schedutil" was silently ignored.
@@ -789,8 +718,6 @@ in
       tree
     ];
   };
-
-  services.displayManager.defaultSession = "hyprland";
 
   environment.localBinInPath = true;
 

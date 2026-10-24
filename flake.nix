@@ -10,8 +10,8 @@
 
     # Hyprland ecosystem pieces, pinned to the SAME dependency set as the
     # Hyprland flake above. Without these `follows`, each flake would pull its
-    # own hyprutils/hyprlang/aquamarine and you can end up with a portal or
-    # polkit agent built against a different ABI than the running compositor.
+    # own hyprutils/hyprlang/aquamarine and you can end up with a portal built
+    # against a different ABI than the running compositor.
     xdg-desktop-portal-hyprland = {
       url = "github:hyprwm/xdg-desktop-portal-hyprland";
       inputs.nixpkgs.follows = "hyprland/nixpkgs";
@@ -23,18 +23,10 @@
       inputs.hyprtoolkit.follows = "hyprland/hyprtoolkit";
     };
 
-    hyprpolkitagent = {
-      url = "github:hyprwm/hyprpolkitagent";
-      inputs.nixpkgs.follows = "hyprland/nixpkgs";
-      inputs.systems.follows = "hyprland/systems";
-      inputs.hyprutils.follows = "hyprland/hyprutils";
-      inputs.hyprlang.follows = "hyprland/hyprlang";
-      inputs.hyprgraphics.follows = "hyprland/hyprgraphics";
-      inputs.aquamarine.follows = "hyprland/aquamarine";
-      inputs.hyprtoolkit.follows = "hyprland/hyprtoolkit";
-    };
-
-    thyx.url = "github:rccyx/thyx";
+    # Desktop shell (bar, notifications, launcher, lock, idle, polkit agent).
+    # The cachix branch tracks the newest commit CI has already built. No
+    # nixpkgs `follows`: that changes the hash and misses the binary cache.
+    noctalia.url = "github:noctalia-dev/noctalia/cachix";
   };
 
   outputs = inputs @ { self, nixpkgs-stable, nixpkgs-unstable, ... }:
@@ -96,12 +88,6 @@
 
         modules = [
           ./configuration.nix
-          inputs.thyx.nixosModules.default
-
-          {
-            services.displayManager.sddm.thyx.enable = true;
-            services.displayManager.sddm.wayland.enable = true;
-          }
 
           {
             environment.systemPackages = with pkgs; [
